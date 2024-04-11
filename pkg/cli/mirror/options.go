@@ -39,6 +39,7 @@ type MirrorOptions struct {
 	OCIRegistriesConfig        string // Registries config file location (it works only with local oci catalogs)
 	OCIInsecureSignaturePolicy bool   // If set, OCI catalog push will not try to push signatures
 	MaxNestedPaths             int
+	UmaskOverride              bool // If set, will override the umask to 0022 for hardened systems
 	// cancelCh is a channel listening for command cancellations
 	cancelCh                          <-chan struct{}
 	once                              sync.Once
@@ -76,6 +77,7 @@ func (o *MirrorOptions) BindFlags(fs *pflag.FlagSet) {
 	fs.BoolVar(&o.OCIInsecureSignaturePolicy, "oci-insecure-signature-policy", o.OCIInsecureSignaturePolicy, "If set, OCI catalog push will not try to push signatures")
 	fs.BoolVar(&o.SkipPruning, "skip-pruning", o.SkipPruning, "If set, will disable pruning globally")
 	fs.IntVar(&o.MaxNestedPaths, "max-nested-paths", 0, "Number of nested paths, for destination registries that limit nested paths")
+	fs.BoolVar(&o.UmaskOverride, "umask-override", o.UmaskOverride, "If set, will override the umask to 0022")
 }
 
 func (o *MirrorOptions) init() {

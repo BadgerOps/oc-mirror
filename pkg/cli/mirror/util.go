@@ -18,6 +18,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"golang.org/x/sys/unix"
 	"k8s.io/klog/v2"
 )
 
@@ -132,4 +133,20 @@ func (o *MirrorOptions) checkErr(err error, acceptableErr func(error) bool, logM
 	}
 
 	return nil
+}
+
+// check current session umask and log the output
+func CheckUmask() {
+	currentUmask := unix.Umask(0)
+	klog.V(2).Infof("current session umask is set to %o", currentUmask)
+
+}
+
+// set session umask to 0022
+func SetUmask() {
+	currentUmask := unix.Umask(0)
+	if currentUmask != 0o22 {
+		klog.V(2).Infof("umask is set to %o, temporarily setting to 0022 for correct handling of oc-mirror archives", currentUmask)
+		unix.Umask(0o22)
+	}
 }
